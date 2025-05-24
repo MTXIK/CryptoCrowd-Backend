@@ -26,3 +26,6 @@ go.work.sum
 
 .# IDEs and editors
 .idea
+
+#config files
+./config.json

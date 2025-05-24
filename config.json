@@ -1,0 +1,17 @@
+{
+  "database": {
+    "user": "postgres",
+    "password": "postgres",
+    "host": "localhost",
+    "port": "5432",
+    "name": "CryptoCrowdDB"
+  },
+  "server": {
+    "host": "127.0.0.1",
+    "port": "9000",
+    "read_timeout": 30,
+    "write_timeout": 30,
+    "idle_timeout": 10,
+    "shutdown_timeout": 10
+  }
+}
