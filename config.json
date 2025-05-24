@@ -13,5 +13,11 @@
     "write_timeout": 30,
     "idle_timeout": 10,
     "shutdown_timeout": 10
+  },
+  "logger": {
+    "level": "debug",
+    "output_path": "stdout",
+    "encoding": "console",
+    "dev_mode": true
   }
 }

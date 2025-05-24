@@ -11,6 +11,7 @@ import (
 type Config struct {
 	Database DatabaseConfig `json:"database"`
 	Server   ServerConfig   `json:"server"`
+	Logger   LoggerConfig   `json:"logger"`
 }
 
 // DatabaseConfig - конфигурация базы данных
@@ -30,6 +31,14 @@ type ServerConfig struct {
 	WriteTimeout    int    `json:"write_timeout"`    // в секундах
 	IdleTimeout     int    `json:"idle_timeout"`     // в секундах
 	ShutdownTimeout int    `json:"shutdown_timeout"` // в секундах
+}
+
+// LoggerConfig - конфигурация логгера
+type LoggerConfig struct {
+	Level      string `json:"level"`
+	OutputPath string `json:"output_path"`
+	Encoding   string `json:"encoding"`
+	DevMode    bool   `json:"dev_mode"`
 }
 
 // Load загружает конфигурацию из JSON-файла
