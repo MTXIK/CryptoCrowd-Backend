@@ -230,3 +230,5 @@ func (r *PostgresAccountRepository) List(ctx context.Context, searchTerm string)
 
 	return users, nil
 }
+
+// TODO: Add check password function
