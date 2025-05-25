@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-// generateSalt генерирует случайный соль заданного размера
+// generateSalt генерирует случайную соль заданного размера
 func generateSalt(size int) ([]byte, error) {
 	salt := make([]byte, size)
 	_, err := rand.Read(salt)
@@ -20,7 +20,7 @@ func generateSalt(size int) ([]byte, error) {
 	return salt, nil
 }
 
-// hashPasswordSHA256 хеширует пароль с использованием SHA-256 и соли
+// hashPasswordSHA256 хэширует пароль с использованием SHA-256 и соли
 func hashPasswordSHA256(password string) (string, error) {
 	salt, err := generateSalt(16)
 	if err != nil {
