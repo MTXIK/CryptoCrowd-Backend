@@ -6,6 +6,13 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+type createAccountRequest struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Role     string `json:"role"`
+}
+
 // AccountHandler handles HTTP requests related to accounts
 type AccountHandler struct {
 	accountService *service.Account
@@ -20,7 +27,7 @@ func NewAccountHandler(accountService *service.Account) *AccountHandler {
 
 // Create handles the creation of a new account
 func (h *AccountHandler) Create(c *fiber.Ctx) error {
-	var account model.Account
+	var account createAccountRequest
 	if err := c.BodyParser(&account); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid request body",
@@ -28,14 +35,20 @@ func (h *AccountHandler) Create(c *fiber.Ctx) error {
 	}
 
 	// Get password from request
-	password := c.FormValue("password")
+	password := account.Password
 	if password == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Password is required",
 		})
 	}
 
-	if err := h.accountService.Create(c.Context(), account, password); err != nil {
+	accountModel := model.Account{
+		Username: account.Username,
+		Email:    account.Email,
+		Role:     account.Role,
+	}
+
+	if err := h.accountService.Create(c.Context(), accountModel, password); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
 		})
