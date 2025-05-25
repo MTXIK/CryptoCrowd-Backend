@@ -6,8 +6,8 @@ CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL
-    role RoleType VARCHAR(50) NOT NULL DEFAULT 'investor',
+    password_hash VARCHAR(255) NOT NULL,
+    role RoleType NOT NULL DEFAULT 'investor',
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
