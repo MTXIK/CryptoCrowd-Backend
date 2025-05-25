@@ -4,14 +4,15 @@ go 1.24.3
 
 require (
 	github.com/georgysavva/scany/v2 v2.1.4
+	github.com/gofiber/fiber/v2 v2.52.8
 	github.com/jackc/pgx/v5 v5.7.5
 	github.com/pressly/goose/v3 v3.24.3
+	github.com/shopspring/decimal v1.4.0
 	go.uber.org/zap v1.27.0
 )
 
 require (
 	github.com/andybalholm/brotli v1.1.1 // indirect
-	github.com/gofiber/fiber/v2 v2.52.8 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect

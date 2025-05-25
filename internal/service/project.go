@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/shopspring/decimal"
 	"time"
 
 	"github.com/CryptoCrowd/internal/logger"
@@ -27,7 +28,7 @@ type ProjectRepository interface {
 	GetByID(ctx context.Context, id int) (model.Project, error)
 	List(ctx context.Context, searchTerm string) ([]model.Project, error)
 	ListByOwnerID(ctx context.Context, id int64, searchTerm string) ([]model.Project, error)
-	GetPhotosByProjectID(ctx context.Context, projectID int) ([]model.ProjectPhoto, error)
+	GetPhotosByProjectID(ctx context.Context, projectID int) ([]model.ProjectImage, error)
 }
 
 // Project service implements business logic for project operations
@@ -69,7 +70,7 @@ func (p *Project) validateProject(project model.Project) error {
 	}
 
 	// Validate project amount
-	if project.AmountRequested <= 0 {
+	if project.AmountRequested.LessThanOrEqual(decimal.NewFromInt(0)) {
 		logger.Error("Invalid project amount requested")
 		return fmt.Errorf("%w", ErrInvalidProjectAmount)
 	}
@@ -86,83 +87,37 @@ func (p *Project) validateProject(project model.Project) error {
 	return nil
 }
 
-// Create creates a new project with validation
+// Create создает новый проект (заглушка)
 func (p *Project) Create(ctx context.Context, project model.Project) error {
-	// Validate project data
-	if err := p.validateProject(project); err != nil {
-		return err
-	}
-
-	// Set initial values for new project
-	project.AmountRaised = 0
-	if project.Status == "" {
-		project.Status = "active"
-	}
-
-	// Create project in repository
-	return p.repo.Create(ctx, project)
+	return nil
 }
 
-// Update updates an existing project with validation
+// Update обновляет существующий проект (заглушка)
 func (p *Project) Update(ctx context.Context, project model.Project, userID int) error {
-	// Get existing project to check ownership
-	existingProject, err := p.repo.GetByID(ctx, project.ID)
-	if err != nil {
-		return err
-	}
-
-	// Check if user is the owner of the project
-	if existingProject.OwnerID != userID {
-		logger.Errorf("User %d attempted to update project %d owned by %d", userID, project.ID, existingProject.OwnerID)
-		return fmt.Errorf("unauthorized: only the project owner can update the project")
-	}
-
-	// Validate project data
-	if err := p.validateProject(project); err != nil {
-		return err
-	}
-
-	// Preserve the original amount raised
-	project.AmountRaised = existingProject.AmountRaised
-
-	// Update project in repository
-	return p.repo.Update(ctx, project)
+	return nil
 }
 
-// Delete deletes a project
+// Delete удаляет проект (заглушка)
 func (p *Project) Delete(ctx context.Context, id int, userID int) error {
-	// Get existing project to check ownership
-	existingProject, err := p.repo.GetByID(ctx, id)
-	if err != nil {
-		return err
-	}
-
-	// Check if user is the owner of the project
-	if existingProject.OwnerID != userID {
-		logger.Errorf("User %d attempted to delete project %d owned by %d", userID, id, existingProject.OwnerID)
-		return fmt.Errorf("unauthorized: only the project owner can delete the project")
-	}
-
-	// Delete project from repository
-	return p.repo.Delete(ctx, id)
+	return nil
 }
 
-// GetByID retrieves a project by ID
+// GetByID возвращает проект по ID (заглушка)
 func (p *Project) GetByID(ctx context.Context, id int) (model.Project, error) {
-	return p.repo.GetByID(ctx, id)
+	return model.Project{}, nil
 }
 
-// List lists all projects with optional search
+// List возвращает список проектов (заглушка)
 func (p *Project) List(ctx context.Context, searchTerm string) ([]model.Project, error) {
-	return p.repo.List(ctx, searchTerm)
+	return nil, nil
 }
 
-// ListByOwnerID lists projects by owner ID with optional search
+// ListByOwnerID возвращает список проектов по ownerID (заглушка)
 func (p *Project) ListByOwnerID(ctx context.Context, ownerID int64, searchTerm string) ([]model.Project, error) {
-	return p.repo.ListByOwnerID(ctx, ownerID, searchTerm)
+	return nil, nil
 }
 
-// GetPhotosByProjectID gets photos for a project
-func (p *Project) GetPhotosByProjectID(ctx context.Context, projectID int) ([]model.ProjectPhoto, error) {
-	return p.repo.GetPhotosByProjectID(ctx, projectID)
+// GetPhotosByProjectID возвращает фото проекта (заглушка)
+func (p *Project) GetPhotosByProjectID(ctx context.Context, projectID int) ([]model.ProjectImage, error) {
+	return nil, nil
 }

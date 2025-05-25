@@ -34,9 +34,6 @@ func (r *PostgresInvestment) Create(ctx context.Context, investment model.Invest
 	defer tx.Rollback(ctx)
 
 	now := time.Now()
-	if investment.InvestedAt == nil {
-		investment.InvestedAt = &now
-	}
 
 	_, err = tx.Exec(ctx, `
         INSERT INTO investments (user_id, project_id, amount, invested_at)
@@ -44,67 +41,10 @@ func (r *PostgresInvestment) Create(ctx context.Context, investment model.Invest
 		investment.UserID,
 		investment.ProjectID,
 		investment.Amount,
-		investment.InvestedAt,
+		now,
 	)
 	if err != nil {
 		return fmt.Errorf("ошибка создания инвестиции: %w", err)
-	}
-
-	return tx.Commit(ctx)
-}
-
-func (r *PostgresInvestment) Update(ctx context.Context, investment model.Investment) error {
-	tx, err := r.pool.Begin(ctx)
-	if err != nil {
-		return fmt.Errorf("%w: %w", ErrInvestmentTxStart, err)
-	}
-	defer tx.Rollback(ctx)
-
-	var existing model.Investment
-	err = pgxscan.Get(ctx, tx, &existing, "SELECT id FROM investments WHERE id = $1 FOR UPDATE", investment.ID)
-	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return ErrInvestmentNotFound
-		}
-		return fmt.Errorf("ошибка получения инвестиции для обновления: %w", err)
-	}
-
-	_, err = tx.Exec(ctx, `
-        UPDATE investments
-        SET user_id = $2, project_id = $3, amount = $4, invested_at = $5
-        WHERE id = $1`,
-		investment.ID,
-		investment.UserID,
-		investment.ProjectID,
-		investment.Amount,
-		investment.InvestedAt,
-	)
-	if err != nil {
-		return fmt.Errorf("ошибка обновления инвестиции: %w", err)
-	}
-
-	return tx.Commit(ctx)
-}
-
-func (r *PostgresInvestment) Delete(ctx context.Context, id int64) error {
-	tx, err := r.pool.Begin(ctx)
-	if err != nil {
-		return fmt.Errorf("%w: %w", ErrInvestmentTxStart, err)
-	}
-	defer tx.Rollback(ctx)
-
-	var existing model.Investment
-	err = pgxscan.Get(ctx, tx, &existing, "SELECT id FROM investments WHERE id = $1 FOR UPDATE", id)
-	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return ErrInvestmentNotFound
-		}
-		return fmt.Errorf("ошибка получения инвестиции для удаления: %w", err)
-	}
-
-	_, err = tx.Exec(ctx, "DELETE FROM investments WHERE id = $1", id)
-	if err != nil {
-		return fmt.Errorf("ошибка удаления инвестиции: %w", err)
 	}
 
 	return tx.Commit(ctx)

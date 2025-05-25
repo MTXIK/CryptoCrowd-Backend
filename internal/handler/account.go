@@ -1,25 +1,27 @@
 package handler
 
 import (
+	"context"
 	"github.com/CryptoCrowd/internal/model"
-	"github.com/CryptoCrowd/internal/service"
 	"github.com/gofiber/fiber/v2"
 )
 
-type createAccountRequest struct {
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Role     string `json:"role"`
+type AccountServiceInterface interface {
+	Create(ctx context.Context, acc model.Account, plainPassword string) error
+	Update(ctx context.Context, acc model.Account) error
+	UpdatePassword(ctx context.Context, email string, newPassword string) error
+	Delete(ctx context.Context, email string) error
+	GetByEmail(ctx context.Context, email string) (model.Account, error)
+	List(ctx context.Context, searchTerm string) ([]model.Account, error)
 }
 
 // AccountHandler handles HTTP requests related to accounts
 type AccountHandler struct {
-	accountService *service.Account
+	accountService AccountServiceInterface
 }
 
 // NewAccountHandler creates a new account handler
-func NewAccountHandler(accountService *service.Account) *AccountHandler {
+func NewAccountHandler(accountService AccountServiceInterface) *AccountHandler {
 	return &AccountHandler{
 		accountService: accountService,
 	}
@@ -27,130 +29,30 @@ func NewAccountHandler(accountService *service.Account) *AccountHandler {
 
 // Create handles the creation of a new account
 func (h *AccountHandler) Create(c *fiber.Ctx) error {
-	var account createAccountRequest
-	if err := c.BodyParser(&account); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid request body",
-		})
-	}
-
-	// Get password from request
-	password := account.Password
-	if password == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Password is required",
-		})
-	}
-
-	accountModel := model.Account{
-		Username: account.Username,
-		Email:    account.Email,
-		Role:     account.Role,
-	}
-
-	if err := h.accountService.Create(c.Context(), accountModel, password); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": err.Error(),
-		})
-	}
-
-	return c.Status(fiber.StatusCreated).JSON(account)
+	return nil
 }
 
 // Update handles the update of an existing account
 func (h *AccountHandler) Update(c *fiber.Ctx) error {
-	var account model.Account
-	if err := c.BodyParser(&account); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid request body",
-		})
-	}
-
-	if err := h.accountService.Update(c.Context(), account); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": err.Error(),
-		})
-	}
-
-	return c.Status(fiber.StatusOK).JSON(account)
+	return nil
 }
 
 // UpdatePassword handles the update of an account's password
 func (h *AccountHandler) UpdatePassword(c *fiber.Ctx) error {
-	email := c.FormValue("email")
-	if email == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Email is required",
-		})
-	}
-
-	newPassword := c.FormValue("new_password")
-	if newPassword == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "New password is required",
-		})
-	}
-
-	if err := h.accountService.UpdatePassword(c.Context(), email, newPassword); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": err.Error(),
-		})
-	}
-
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"message": "Password updated successfully",
-	})
+	return nil
 }
 
 // Delete handles the deletion of an account
 func (h *AccountHandler) Delete(c *fiber.Ctx) error {
-	email := c.Params("email")
-	if email == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Email is required",
-		})
-	}
-
-	if err := h.accountService.Delete(c.Context(), email); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": err.Error(),
-		})
-	}
-
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"message": "Account deleted successfully",
-	})
+	return nil
 }
 
 // GetByEmail handles the retrieval of an account by email
 func (h *AccountHandler) GetByEmail(c *fiber.Ctx) error {
-	email := c.Params("email")
-	if email == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Email is required",
-		})
-	}
-
-	account, err := h.accountService.GetByEmail(c.Context(), email)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": err.Error(),
-		})
-	}
-
-	return c.Status(fiber.StatusOK).JSON(account)
+	return nil
 }
 
 // List handles the listing of accounts
 func (h *AccountHandler) List(c *fiber.Ctx) error {
-	searchTerm := c.Query("search", "")
-
-	accounts, err := h.accountService.List(c.Context(), searchTerm)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": err.Error(),
-		})
-	}
-
-	return c.Status(fiber.StatusOK).JSON(accounts)
+	return nil
 }
