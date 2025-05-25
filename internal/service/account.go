@@ -2,7 +2,18 @@ package service
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"regexp"
+
+	"github.com/CryptoCrowd/internal/logger"
 	"github.com/CryptoCrowd/internal/model"
+)
+
+var (
+	ErrInvalidUsername = errors.New("invalid username")
+	ErrInvalidEmail    = errors.New(("invalid email"))
+	ErrInvalidRole     = errors.New("invalid role")
 )
 
 type AccountRepository interface {
@@ -14,12 +25,35 @@ type AccountRepository interface {
 	List(ctx context.Context, searchTerm string) ([]model.Account, error)
 }
 type Account struct {
-	repo AccountRepository
+	repo        AccountRepository
+	emailRegexp *regexp.Regexp
+}
+
+func NewAccount(repo AccountRepository) *Account {
+	reg, _ := regexp.Compile(`/^[a-zA-Z0–9._%+-]+@[a-zA-Z0–9.-]+\.[a-zA-Z]{2,}$/`)
+
+	return &Account{
+		repo:        repo,
+		emailRegexp: reg,
+	}
 }
 
 func (a *Account) Create(ctx context.Context, acc model.Account, plainPassword string) error {
-	if acc.Username == "" {
 
+	if acc.Username == "" {
+		logger.Error("Invalid username")
+		return fmt.Errorf("%w", ErrInvalidUsername)
 	}
+
+	if !a.emailRegexp.MatchString(acc.Email) {
+		logger.Errorf("Invalid email: %s", acc.Email)
+		return fmt.Errorf("%w: %s", ErrInvalidEmail, acc.Email)
+	}
+
+	if acc.Role == "" {
+		logger.Error("Invalid role")
+		return fmt.Errorf("%w", ErrInvalidRole)
+	}
+
 	return a.repo.Create(ctx, acc, plainPassword)
 }
