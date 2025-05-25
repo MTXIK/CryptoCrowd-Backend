@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/jackc/pgx/v5"
 	"time"
 
 	"github.com/CryptoCrowd/internal/db"
 	"github.com/CryptoCrowd/internal/model"
 	"github.com/georgysavva/scany/v2/pgxscan"
-	"github.com/jackc/pgx/v5"
 )
 
 var (
@@ -166,7 +166,7 @@ func (r *PostgresAccountRepository) Delete(ctx context.Context, email string) er
 
 	var existingUser model.Account
 	err = pgxscan.Get(ctx, tx, &existingUser,
-		"SELECT id FROM users WHERE email = $1 FOR UPDATE", email)
+		`SELECT id FROM users WHERE email = $1 FOR UPDATE`, email)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return ErrUserNotFound
@@ -190,7 +190,7 @@ func (r *PostgresAccountRepository) Delete(ctx context.Context, email string) er
 func (r *PostgresAccountRepository) GetByEmail(ctx context.Context, email string) (model.Account, error) {
 	var user model.Account
 	err := pgxscan.Get(ctx, r.pool, &user,
-		"SELECT id, username, email, role, created_at, updated_at FROM users WHERE email = $1",
+		`SELECT id, username, email, role, created_at, updated_at FROM users WHERE email = $1`,
 		email,
 	)
 
