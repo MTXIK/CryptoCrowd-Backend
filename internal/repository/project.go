@@ -185,3 +185,6 @@ func (r *PostgresProjectRepository) GetPhotosByProjectID(ctx context.Context, pr
 	}
 	return photos, nil
 }
+
+//TODO: Создать метод для создания фото проекта
+//TODO: Создать метод для обновления собранной суммы проекта

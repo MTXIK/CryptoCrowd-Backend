@@ -15,8 +15,8 @@ type Project struct {
 	Status          string     `db:"status" json:"status"`
 	Name            string     `db:"name" json:"name"`
 	Description     string     `db:"description" json:"description"`
-	AmountRequested float64    `db:"amountrequested" json:"amount_requested"`
-	AmountRaised    float64    `db:"amountraised" json:"amount_raised"`
+	AmountRequested float64    `db:"amountrequested" json:"amount_requested"` // TODO: Не использовать float64, использовать github.com/Rhymond/go-money
+	AmountRaised    float64    `db:"amountraised" json:"amount_raised"`       // TODO: Не использовать float64, использовать github.com/Rhymond/go-money
 	DeadlineAt      *time.Time `db:"deadlineat" json:"deadline_at,omitempty"`
 	CreatedAt       *time.Time `db:"createdat" json:"created_at,omitempty"`
 }
