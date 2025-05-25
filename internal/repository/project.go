@@ -17,17 +17,17 @@ var (
 	ErrProjectTxStart       = errors.New("ошибка начала транзакции")
 )
 
-type PostgresProjectRepository struct {
+type PostgresProject struct {
 	pool *db.Pool
 }
 
-func NewPostgresProjectRepository(pool *db.Pool) *PostgresProjectRepository {
-	return &PostgresProjectRepository{
+func NewPostgresProject(pool *db.Pool) *PostgresProject {
+	return &PostgresProject{
 		pool: pool,
 	}
 }
 
-func (r *PostgresProjectRepository) Create(ctx context.Context, project model.Project) error {
+func (r *PostgresProject) Create(ctx context.Context, project model.Project) error {
 	tx, err := r.pool.Begin(ctx)
 	if err != nil {
 		return fmt.Errorf("%w: %w", ErrProjectTxStart, err)
@@ -54,7 +54,7 @@ func (r *PostgresProjectRepository) Create(ctx context.Context, project model.Pr
 	return tx.Commit(ctx)
 }
 
-func (r *PostgresProjectRepository) Update(ctx context.Context, project model.Project) error {
+func (r *PostgresProject) Update(ctx context.Context, project model.Project) error {
 	tx, err := r.pool.Begin(ctx)
 	if err != nil {
 		return fmt.Errorf("%w: %w", ErrProjectTxStart, err)
@@ -89,7 +89,7 @@ func (r *PostgresProjectRepository) Update(ctx context.Context, project model.Pr
 	return tx.Commit(ctx)
 }
 
-func (r *PostgresProjectRepository) Delete(ctx context.Context, id int) error {
+func (r *PostgresProject) Delete(ctx context.Context, id int) error {
 	tx, err := r.pool.Begin(ctx)
 	if err != nil {
 		return fmt.Errorf("%w: %w", ErrProjectTxStart, err)
@@ -113,7 +113,7 @@ func (r *PostgresProjectRepository) Delete(ctx context.Context, id int) error {
 	return tx.Commit(ctx)
 }
 
-func (r *PostgresProjectRepository) GetByID(ctx context.Context, id int) (model.Project, error) {
+func (r *PostgresProject) GetByID(ctx context.Context, id int) (model.Project, error) {
 	var project model.Project
 	err := pgxscan.Get(ctx, r.pool, &project,
 		`SELECT id, ownerID, status, name, description, amountRequested, amountRaised, deadlineAt, createdAt FROM projects WHERE id = $1`,
@@ -130,7 +130,7 @@ func (r *PostgresProjectRepository) GetByID(ctx context.Context, id int) (model.
 
 // TODO: Implement GetByIDs method
 
-func (r *PostgresProjectRepository) List(ctx context.Context, searchTerm string) ([]model.Project, error) {
+func (r *PostgresProject) List(ctx context.Context, searchTerm string) ([]model.Project, error) {
 	var projects []model.Project
 	query := `SELECT id, ownerID, status, name, description, amountRequested, amountRaised, deadlineAt, createdAt FROM projects WHERE 1=1`
 	var args []any
@@ -153,7 +153,7 @@ func (r *PostgresProjectRepository) List(ctx context.Context, searchTerm string)
 	return projects, nil
 }
 
-func (r *PostgresProjectRepository) ListByOwnerID(ctx context.Context, id int64, searchTerm string) ([]model.Project, error) {
+func (r *PostgresProject) ListByOwnerID(ctx context.Context, id int64, searchTerm string) ([]model.Project, error) {
 	var projects []model.Project
 	query := `SELECT id, ownerID, status, name, description, amountRequested, amountRaised, deadlineAt, createdAt FROM projects WHERE ownerID = $1`
 	var args []any
@@ -176,7 +176,7 @@ func (r *PostgresProjectRepository) ListByOwnerID(ctx context.Context, id int64,
 	return projects, nil
 }
 
-func (r *PostgresProjectRepository) GetPhotosByProjectID(ctx context.Context, projectID int) ([]model.ProjectPhoto, error) {
+func (r *PostgresProject) GetPhotosByProjectID(ctx context.Context, projectID int) ([]model.ProjectPhoto, error) {
 	var photos []model.ProjectPhoto
 	err := pgxscan.Select(ctx, r.pool, &photos,
 		`SELECT id, project_id, url, created_at FROM project_photos WHERE project_id = $1 ORDER BY created_at`, projectID)

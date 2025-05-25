@@ -21,17 +21,17 @@ var (
 	ErrTransactionStartError = errors.New("ошибка начала транзакции")
 )
 
-type PostgresAccountRepository struct {
+type PostgresAccount struct {
 	pool *db.Pool
 }
 
-func NewPostgresAccountRepository(pool *db.Pool) *PostgresAccountRepository {
-	return &PostgresAccountRepository{
+func NewPostgresAccount(pool *db.Pool) *PostgresAccount {
+	return &PostgresAccount{
 		pool: pool,
 	}
 }
 
-func (r *PostgresAccountRepository) Create(ctx context.Context, acc model.Account, plainPassword string) error {
+func (r *PostgresAccount) Create(ctx context.Context, acc model.Account, plainPassword string) error {
 	tx, err := r.pool.Begin(ctx)
 	if err != nil {
 		return fmt.Errorf("%w: %w", ErrTransactionStartError, err)
@@ -72,7 +72,7 @@ func (r *PostgresAccountRepository) Create(ctx context.Context, acc model.Accoun
 }
 
 // Update обновляет информацию о пользователе
-func (r *PostgresAccountRepository) Update(ctx context.Context, acc model.Account) error {
+func (r *PostgresAccount) Update(ctx context.Context, acc model.Account) error {
 	now := time.Now()
 
 	tx, err := r.pool.Begin(ctx)
@@ -112,7 +112,7 @@ func (r *PostgresAccountRepository) Update(ctx context.Context, acc model.Accoun
 }
 
 // UpdatePassword обновляет пароль пользователя
-func (r *PostgresAccountRepository) UpdatePassword(ctx context.Context, email string, newPassword string) error {
+func (r *PostgresAccount) UpdatePassword(ctx context.Context, email string, newPassword string) error {
 	tx, err := r.pool.Begin(ctx)
 	if err != nil {
 		return fmt.Errorf("%w: %w", ErrTransactionStartError, err)
@@ -157,7 +157,7 @@ func (r *PostgresAccountRepository) UpdatePassword(ctx context.Context, email st
 }
 
 // Delete удаляет пользователя по ID
-func (r *PostgresAccountRepository) Delete(ctx context.Context, email string) error {
+func (r *PostgresAccount) Delete(ctx context.Context, email string) error {
 	tx, err := r.pool.Begin(ctx)
 	if err != nil {
 		return fmt.Errorf("%w: %w", ErrTransactionStartError, err)
@@ -187,7 +187,7 @@ func (r *PostgresAccountRepository) Delete(ctx context.Context, email string) er
 }
 
 // GetByEmail получает пользователя по email
-func (r *PostgresAccountRepository) GetByEmail(ctx context.Context, email string) (model.Account, error) {
+func (r *PostgresAccount) GetByEmail(ctx context.Context, email string) (model.Account, error) {
 	var user model.Account
 	err := pgxscan.Get(ctx, r.pool, &user,
 		`SELECT id, username, email, role, created_at, updated_at FROM users WHERE email = $1`,
@@ -205,7 +205,7 @@ func (r *PostgresAccountRepository) GetByEmail(ctx context.Context, email string
 }
 
 // List возвращает список всех пользователей
-func (r *PostgresAccountRepository) List(ctx context.Context, searchTerm string) ([]model.Account, error) {
+func (r *PostgresAccount) List(ctx context.Context, searchTerm string) ([]model.Account, error) {
 	var users []model.Account
 	query := "SELECT id, username, email, role, created_at, updated_at FROM users WHERE 1=1"
 	var args []any
